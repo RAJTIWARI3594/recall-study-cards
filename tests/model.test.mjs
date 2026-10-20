@@ -1,0 +1,18 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {create,decode,encode,grade,dueCards,DAY} from '../model.js';
+const c=()=>create('Question','Answer','c1',1000);
+test('new cards due immediately',()=>assert.equal(dueCards([c()],1000).length,1));
+test('not due before timestamp',()=>assert.equal(dueCards([c()],999).length,0));
+test('good schedules day',()=>assert.equal(grade(c(),'good',1000).due,1000+DAY));
+test('easy starts three days',()=>assert.equal(grade(c(),'easy',1000).interval,3));
+test('again schedules ten minutes',()=>assert.equal(grade(c(),'again',1000).due,601000));
+test('grows with ease',()=>assert.equal(grade({...c(),interval:4},'good',1000).interval,10));
+test('caps interval',()=>assert.equal(grade({...c(),interval:365},'easy').interval,365));
+test('ease lower bound',()=>assert.equal(grade({...c(),ease:1.3},'again').ease,1.3));
+test('unknown grade rejected',()=>assert.throws(()=>grade(c(),'other')));
+test('backup roundtrip',()=>assert.deepEqual(decode(encode([c()])),[c()]));
+test('duplicate IDs rejected',()=>assert.throws(()=>decode(JSON.stringify({version:1,cards:[c(),c()]}))));
+test('blank question rejected',()=>assert.throws(()=>create(' ','a','x')));
+test('invalid time rejected',()=>assert.throws(()=>decode(JSON.stringify({version:1,cards:[{...c(),due:-1}]}))));
+test('version rejected',()=>assert.throws(()=>decode('{"version":2,"cards":[]}')));
+test('markup is plain data',()=>assert.equal(create('<img src=x>','<script>x</script>','x').front,'<img src=x>'));
+test('input not mutated',()=>{const x=c();grade(x,'good');assert.equal(x.reviews,0);});
