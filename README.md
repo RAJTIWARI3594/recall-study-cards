@@ -37,3 +37,7 @@ See [VALIDATION.md](VALIDATION.md) for tested environments and scope.
 ![Actual running Recall Study Cards output](docs/recall-desktop.png)
 
 ![Actual running Recall Study Cards output](docs/recall-mobile.png)
+
+## Live demo
+
+Open the browser version at <https://rajtiwari3594.github.io/recall-study-cards/>. It runs entirely in the browser; each visitor's documents or study data stay in that browser and are not synchronized to an account.
